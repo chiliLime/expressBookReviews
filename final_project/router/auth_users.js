@@ -4,15 +4,12 @@ let books = require("./booksdb.js");
 const regd_users = express.Router();
 
 let users = [{
-  username: "user1",
-  password: "user1"},
+  username: "test_user",
+  password: "password"},
   {
-    username: "user2",
-    password: "user2"},
-    {
-      username: "user3",
-      password: "user3"}
-];
+    username: "test_user2",
+    password: "password"}
+    ];
 
 const isValid = (username)=>{ //returns boolean
 //write code to check is the username is valid
@@ -22,11 +19,9 @@ const isValid = (username)=>{ //returns boolean
 
 const authenticatedUser = (username,password)=>{ //returns boolean
   const matchingUsers = users.filter((user) => user.username === username && user.password === password);
-    return matchingUsers.length > 0;
+  return matchingUsers.length > 0;
   
 }
-  //write code to check if username and password match the one we have in records.
-
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
@@ -41,25 +36,24 @@ regd_users.post("/login", (req,res) => {
 
     if (authenticatedUser(username,password)) {
         let accessToken = jwt.sign({
-        data: password
+            data: password
         }, 'access', { expiresIn: 60 * 60 });
 
         req.session.authorization = {
-        accessToken,username
-    }
-    return res.status(200).send("User successfully logged in");
+            accessToken,username
+        }
+        return res.status(200).send("User successfully logged in");
     } else {
         return res.status(208).json({message: "Invalid Login. Check username and password"});
     }
 });
-
-
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
     const review = req.body.review;
     const username = req.session.authorization.username;
+    console.log("add review: ", req.params, req.body, req.session);
     if (books[isbn]) {
         let book = books[isbn];
         book.reviews[username] = review;
